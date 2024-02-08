@@ -1,6 +1,7 @@
 """Titiler middlewares."""
 
 import logging
+import os
 import re
 import time
 import urllib.parse
@@ -62,6 +63,30 @@ class CacheControlMiddleware:
 
         await self.app(scope, receive, send_wrapper)
 
+class DomainNameSettingMiddleware:
+    """Middleware to set domain name request"""
+
+    def __init__(self, app: ASGIApp) -> None:
+        """Init Middleware.
+
+        Args:
+            app (ASGIApp): starlette/FastAPI application.
+
+        """
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send):
+        """Handle call."""
+        domain_name = os.environ.get('DOMAIN_NAME')
+        if domain_name:
+            headers = [
+                header for header in scope.get('headers', [])
+                if header[0] != b'host'
+            ]
+            headers.append((b'host', f'{domain_name}'.encode('latin-1')))
+            scope['headers'] = headers
+
+        await self.app(scope, receive, send)
 
 class TotalTimeMiddleware:
     """MiddleWare to add Total process time in response headers."""

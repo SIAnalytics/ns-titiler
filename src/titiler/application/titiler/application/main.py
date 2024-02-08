@@ -27,6 +27,7 @@ from titiler.core.middleware import (
     LoggerMiddleware,
     LowerCaseQueryStringMiddleware,
     TotalTimeMiddleware,
+    DomainNameSettingMiddleware,
 )
 from titiler.extensions import (
     cogValidateExtension,
@@ -193,6 +194,8 @@ if api_settings.debug:
 if api_settings.lower_case_query_parameters:
     app.add_middleware(LowerCaseQueryStringMiddleware)
 
+
+app.add_middleware(DomainNameSettingMiddleware)
 
 @app.get(
     "/healthz",
